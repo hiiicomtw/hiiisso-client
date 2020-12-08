@@ -14,6 +14,10 @@ use Illuminate\Support\Str;
 
 class HiiiAuthService
 {
+    protected $app;
+    protected $customCreators = [];
+    protected $guards = [];
+    protected $userResolver;
     protected $request;
     protected $httpClient;
     protected $serverUrl;
@@ -29,7 +33,16 @@ class HiiiAuthService
 
     public $guard = 'admin';
 
-    public function __construct(Request $request, $config = [])
+    public function __construct($app, $config = [])
+    {
+        $this->app = $app;
+        $this->setConfig($config);
+        $this->userResolver = function ($guard = null) {
+            return $this->guard($guard)->user();
+        };
+    }
+
+    public function setConfig($config = [])
     {
         $this->guzzle = Arr::get($config, 'guzzle', []);
         $this->clientId = $config['client_id'];
@@ -39,8 +52,6 @@ class HiiiAuthService
         if(!DataHelper::keyValueIsEmpty('fail_redirect', $config)){
             $this->failRedirectUrl = $this->formatRedirectUrl($config['fail_redirect']);
         }
-
-        $this->request = $request;
     }
 
     public function guard($guard)

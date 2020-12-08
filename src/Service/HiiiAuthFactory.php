@@ -4,5 +4,6 @@ namespace Hiiicomtw\HiiiSSOClient\Service;
 
 interface HiiiAuthFactory
 {
-    public function driver($driver = null);
+    public function guard($name = null);
+    public function shouldUse($name = null);
 }

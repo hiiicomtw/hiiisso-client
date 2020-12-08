@@ -3,12 +3,21 @@
 
 namespace Hiiicomtw\HiiiSSOClient\Service;
 
+use Hiiicomtw\HiiiSSOClient\Service\HiiiAuthFactory;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
 class HiiiAuthServerProvider extends ServiceProvider
 {
+
+    private $config = null;
+
     public function boot()
-    {}
+    {
+        $this->publishes([
+            $this->config => config_path('hiiisso-client.php')
+        ], 'hiiisso-client');
+    }
 
     public function __construct(Application $app)
     {
@@ -20,15 +29,16 @@ class HiiiAuthServerProvider extends ServiceProvider
     public function register()
     {
     	$this->mergeConfigFrom($this->config, 'hiiisso-client');
-        $this->app->singleton(HiiiAuthService::class, function(){
-            return new HiiiAuthService;
+    	$config = $this->config;
+        $this->app->singleton(HiiiAuthFactory::class, function($app) use($config){
+            return new HiiiAuthService($app, $config);
         });
 
     }
 
     public function provides()
     {
-        return [HiiiAuthService::class];
+        return [HiiiAuthFactory::class];
     }
 
 }
