@@ -14,10 +14,6 @@ use Illuminate\Support\Str;
 
 class HiiiAuthService
 {
-    protected $app;
-    protected $customCreators = [];
-    protected $guards = [];
-    protected $userResolver;
     protected $request;
     protected $httpClient;
     protected $serverUrl;
@@ -30,27 +26,19 @@ class HiiiAuthService
     protected $scopes = [];
     protected $scopeSeparator = ',';
     protected $encodingType = PHP_QUERY_RFC1738;
-
     public $guard = 'admin';
 
-    public function __construct($app, $config = [])
-    {
-        $this->app = $app;
-        $this->setConfig($config);
-        $this->userResolver = function ($guard = null) {
-            return $this->guard($guard)->user();
-        };
-    }
 
-    public function setConfig($config = [])
+
+    public function setConfig()
     {
-        $this->guzzle = Arr::get($config, 'guzzle', []);
-        $this->clientId = $config['client_id'];
-        $this->clientSecret = $config['client_secret'];
-        $this->serverUrl = $config['server_url'];
-        $this->redirectUrl = $this->formatRedirectUrl($config['redirect']);
-        if(!DataHelper::keyValueIsEmpty('fail_redirect', $config)){
-            $this->failRedirectUrl = $this->formatRedirectUrl($config['fail_redirect']);
+        $this->guzzle = Arr::get(config('hiiisso-client'), 'guzzle', []);
+        $this->clientId = config('hiiisso-client.client_id');
+        $this->clientSecret = config('hiiisso-client.client_secret');
+        $this->serverUrl = config('hiiisso-client.server_url');
+        $this->redirectUrl = $this->formatRedirectUrl(config('hiiisso-client.redirect'));
+        if(!DataHelper::keyValueIsEmpty('fail_redirect', config('hiiisso-client'))){
+            $this->failRedirectUrl = $this->formatRedirectUrl(config('hiiisso-client.fail_redirect'));
         }
     }
 
@@ -157,13 +145,11 @@ class HiiiAuthService
         return $this;
     }
 
-    protected function formatRedirectUrl(array $config)
+    protected function formatRedirectUrl($redirect)
     {
-        $redirect = value($config['redirect']);
-
         return Str::startsWith($redirect, '/')
-                    ? $this->app['url']->to($redirect)
-                    : $redirect;
+            ? $this->app['url']->to($redirect)
+            : $redirect;
     }
 
     protected function getUserByToken($token)
@@ -179,9 +165,11 @@ class HiiiAuthService
     public function user()
     {
         if ($this->hasInvalidState()) {
+            \Log::error('has invalid state');
 //            error_log("has invalid state");
 //            throw new InvalidStateException('invalid state');
         }
+        \Log::info('user session_id: '.$this->request->session()->getId());
         $response = $this->getAccessTokenResponse($this->getCode());
         $user = $this->mapUserToObject($this->getUserByToken(
             $token = Arr::get($response, 'access_token')
@@ -238,6 +226,8 @@ class HiiiAuthService
 
     public function getAccessTokenResponse($code)
     {
+        \Log::info('getAccessTokenResponse session_id: '.$this->request->session()->getId());
+
         $response = $this->getHttpClient()->post($this->getTokenUrl(), [
             'headers' => ['Accept' => 'application/json'],
             'form_params' => $this->getTokenFields($code)

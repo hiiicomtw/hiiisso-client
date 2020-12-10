@@ -10,6 +10,7 @@ use Illuminate\Support\ServiceProvider;
 class HiiiAuthServerProvider extends ServiceProvider
 {
 
+    protected $defer = true;
     private $config = null;
 
     public function boot()
@@ -22,16 +23,16 @@ class HiiiAuthServerProvider extends ServiceProvider
     public function __construct(Application $app)
     {
         parent::__construct($app);
-
-        $this->config = dirname(__DIR__) . '/config/hiiisso-client.php';
     }
 
     public function register()
     {
-    	$this->mergeConfigFrom($this->config, 'hiiisso-client');
-    	$config = $this->config;
+        $this->config = config_path('hiiisso-client.php');
+        $this->mergeConfigFrom($this->config, 'hiiisso-client');
+        $config = $this->config;
         $this->app->singleton(HiiiAuthFactory::class, function($app) use($config){
-            return new HiiiAuthService($app, $config);
+            $hiiiAuthService = new HiiiAuthManager($app);
+            return $hiiiAuthService;
         });
 
     }

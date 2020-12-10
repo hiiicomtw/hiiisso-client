@@ -16,7 +16,7 @@ class HiiiAuthFacade extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return HiiiAuthService::class;
+        return HiiiAuthFactory::class;
     }
 
 }
