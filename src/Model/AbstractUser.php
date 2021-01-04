@@ -32,10 +32,9 @@ abstract class AbstractUser implements ArrayAccess, UserContracts
         return $this->user;
     }
 
-
     public function getUser()
     {
-
+        return $this->user;
     }
 
     public function setRaw(array $user)

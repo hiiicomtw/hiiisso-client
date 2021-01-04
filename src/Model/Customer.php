@@ -6,11 +6,22 @@ namespace Hiiicomtw\HiiiSSOClient\Model;
 
 class Customer extends AbstractUser
 {
-
     public $cellphone;
+    public $groupId;
+    public $groupTitle;
     public $token;
     public $refreshToken;
     public $expiresIn;
+
+    public function getGroupId()
+    {
+        return $this->groupId;
+    }
+
+    public function getGroupTitle()
+    {
+        return $this->groupTitle;
+    }
 
     public function getCellphone()
     {

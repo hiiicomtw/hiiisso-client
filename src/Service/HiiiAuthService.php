@@ -145,6 +145,11 @@ class HiiiAuthService
         return $this;
     }
 
+    /**
+     * @param $redirect
+     *
+     * @return mixed
+     */
     protected function formatRedirectUrl($redirect)
     {
         return Str::startsWith($redirect, '/')
@@ -152,6 +157,11 @@ class HiiiAuthService
             : $redirect;
     }
 
+    /**
+     * @param $token
+     *
+     * @return mixed
+     */
     protected function getUserByToken($token)
     {
         $userUrl = $this->serverUrl . '/api/sso/' . $this->getGuard() . '/user?access_token='.$token;
@@ -162,6 +172,9 @@ class HiiiAuthService
         return $user;
     }
 
+    /**
+     * @return Admin|Customer
+     */
     public function user()
     {
         if ($this->hasInvalidState()) {
@@ -178,6 +191,11 @@ class HiiiAuthService
                     ->setExpiresIn(Arr::get($response, 'expires_in'));
     }
 
+    /**
+     * @param $token
+     *
+     * @return Admin|Customer
+     */
     public function userFromToken($token)
     {
         $user = $this->mapUserToObject($this->getUserByToken($token));
@@ -185,6 +203,11 @@ class HiiiAuthService
         return $user->setToken($token);
     }
 
+    /**
+     * @param array $user
+     *
+     * @return Admin|Customer
+     */
     protected function mapUserToObject(array $user)
     {
         if($this->guard == 'admin') {
@@ -197,9 +220,12 @@ class HiiiAuthService
         }else {
             return (new Customer)->setRaw($user)->map([
                 'id' => $user['id'],
+                'groupId' => $user['customer_group_id'],
+                'groupTitle' => $user['customer_group_title'],
                 'name' => $user['name'],
                 'email' => $user['email'],
                 'cellphone' => $user['cellphone'],
+                'profile' => $user['profile'],
             ]);
         }
 
@@ -222,6 +248,11 @@ class HiiiAuthService
         ];
     }
 
+    /**
+     * @param $code
+     *
+     * @return mixed
+     */
     public function getAccessTokenResponse($code)
     {
 

@@ -8,7 +8,6 @@ use Hiiicomtw\HiiiSSOClient\Model\Customer;
 use Illuminate\Support\Arr;
 use GuzzleHttp\ClientInterface;
 
-
 class CustomerProvider extends AbstractProvider implements ProviderInterface
 {
     public $guard = 'customer';
@@ -52,6 +51,8 @@ class CustomerProvider extends AbstractProvider implements ProviderInterface
     {
         return (new Customer)->setRaw($user)->map([
             'id' => $user['id'],
+            'groupId' => $user['customer_group_id'],
+            'groupTitle' => $user['customer_group_title'],
             'name' => $user['name'],
             'email' => $user['email'],
             'cellphone' => $user['cellphone'],
