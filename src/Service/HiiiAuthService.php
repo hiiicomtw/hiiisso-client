@@ -165,11 +165,9 @@ class HiiiAuthService
     public function user()
     {
         if ($this->hasInvalidState()) {
-            \Log::error('has invalid state');
 //            error_log("has invalid state");
 //            throw new InvalidStateException('invalid state');
         }
-        \Log::info('user session_id: '.$this->request->session()->getId());
         $response = $this->getAccessTokenResponse($this->getCode());
         $user = $this->mapUserToObject($this->getUserByToken(
             $token = Arr::get($response, 'access_token')
@@ -226,7 +224,6 @@ class HiiiAuthService
 
     public function getAccessTokenResponse($code)
     {
-        \Log::info('getAccessTokenResponse session_id: '.$this->request->session()->getId());
 
         $response = $this->getHttpClient()->post($this->getTokenUrl(), [
             'headers' => ['Accept' => 'application/json'],

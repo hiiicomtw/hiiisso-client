@@ -35,7 +35,6 @@ class AdminProvider extends AbstractProvider implements ProviderInterface
 
     protected function getUserByToken($token)
     {
-        \Log::info('getUserByToken session_id: '.$this->request->session()->getId());
         $userUrl = $this->serverUrl . '/api/sso/' . $this->getGuard() . '/user';
         $response = $this->getHttpClient()->get($userUrl, [
             'headers' => [

@@ -36,15 +36,15 @@ class CustomerProvider extends AbstractProvider implements ProviderInterface
 
     protected function getUserByToken($token)
     {
-        $userUrl = $this->serverUrl . '/api/sso/' . $this->getGuard() . '/user?access_token='.$token;
-        $response = $this->getHttpClient()->get($meUrl, [
+        $userUrl = $this->serverUrl . '/api/sso/' . $this->getGuard() . '/user';
+        $response = $this->getHttpClient()->get($userUrl, [
             'headers' => [
                 'Accept' => 'application/json',
+                'Authorization' => 'Bearer '.$token
             ],
         ]);
 
         $user = json_decode($response->getBody(), true);
-
         return $user;
     }
 
