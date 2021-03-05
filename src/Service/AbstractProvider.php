@@ -4,8 +4,10 @@
 namespace Hiiicomtw\HiiiSSOClient\Service;
 
 
+use App\Services\Api\ApiStatusCodeEnum;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
+use Hiiicomtw\HiiiSSOClient\Exceptions\AuthErrorException;
 use Hiiicomtw\HiiiSSOClient\Helper\DataHelper;
 use Hiiicomtw\HiiiSSOClient\Model\Admin;
 use Hiiicomtw\HiiiSSOClient\Model\Customer;
@@ -139,6 +141,7 @@ abstract class AbstractProvider implements ProviderContract
 
     /**
      * {@inheritdoc}
+     * @throws
      */
     public function user()
     {
@@ -147,13 +150,17 @@ abstract class AbstractProvider implements ProviderContract
 //        }
 
         $response = $this->getAccessTokenResponse($this->getCode());
-        $user = $this->mapUserToObject($this->getUserByToken(
-            $token = Arr::get($response, 'access_token')
-        ));
+        if(Arr::get($response, 'access_token') === ApiStatusCodeEnum::SUCCESS){
+            $user = $this->mapUserToObject($this->getUserByToken(
+                $token = Arr::get($response, 'access_token')
+            ));
 
-        return $user->setToken($token)
-                    ->setRefreshToken(Arr::get($response, 'refresh_token'))
-                    ->setExpiresIn(Arr::get($response, 'expires_in'));
+            return $user->setToken($token)
+                        ->setRefreshToken(Arr::get($response, 'refresh_token'))
+                        ->setExpiresIn(Arr::get($response, 'expires_in'));
+        }else {
+            throw new AuthErrorException('找不登入資料，請重新登入');
+        }
     }
 
     /**
