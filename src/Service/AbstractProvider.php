@@ -150,7 +150,7 @@ abstract class AbstractProvider implements ProviderContract
 //        }
 
         $response = $this->getAccessTokenResponse($this->getCode());
-        if(Arr::get($response, 'access_token') === ApiStatusCodeEnum::SUCCESS){
+        if(Arr::get($response, 'status') === ApiStatusCodeEnum::SUCCESS){
             $user = $this->mapUserToObject($this->getUserByToken(
                 $token = Arr::get($response, 'access_token')
             ));
