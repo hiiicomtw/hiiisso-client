@@ -159,7 +159,7 @@ abstract class AbstractProvider implements ProviderContract
                         ->setRefreshToken(Arr::get($response, 'refresh_token'))
                         ->setExpiresIn(Arr::get($response, 'expires_in'));
         }else {
-            throw new AuthErrorException('找不登入資料，請重新登入');
+            throw new AuthErrorException('找不登入資料，請重新登入: error【'.Arr::get($response, 'message').'】');
         }
     }
 
